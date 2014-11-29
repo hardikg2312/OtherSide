@@ -7,8 +7,7 @@ class Api::V1::SessionsController < Api::V1::MainController
       render :json => { errorcode: 2, errorstr: "Required parameters email and password", result: []}
     else
       if user = User.authenticate(params[:email], params[:password])
-        access_token = User.generate_access_token
-        user.update_attributes(:access_token => access_token)
+        access_token = user.generate_access_token
         result = { "access_token" => access_token, "expires_at" => nil }
         render :json => { errorcode: 0, errorstr: "Success", result: result }
       else

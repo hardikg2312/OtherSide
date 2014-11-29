@@ -13,6 +13,7 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password
   validates_presence_of   :password, :on => :create
   validates_length_of     :password, :on => :create,   :within => 5..40
+  validates_uniqueness_of :access_token
 
 
   def encrypt_password
@@ -22,20 +23,19 @@ class User < ActiveRecord::Base
     end
   end
 
+  def generate_access_token
+    begin
+      access_token = SecureRandom.hex
+    end while User.exists?(access_token: access_token)
+    self.update_attributes(:access_token => access_token)
+    access_token
+  end
+
   class << self
 
     def authenticate(email, password)
       user = find_by_email(email) || find_by_user_name(email)
-      if user && user.password_hash == BCrypt::Engine.hash_secret(password, user.password_salt)
-        user
-      end
-    end
-
-    def generate_access_token
-      begin
-        access_token = SecureRandom.hex
-      end while User.exists?(access_token: access_token)
-      access_token
+      return user if user && user.password_hash == BCrypt::Engine.hash_secret(password, user.password_salt)
     end
 
   end
