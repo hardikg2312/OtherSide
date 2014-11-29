@@ -40,3 +40,5 @@ gem 'spring',        group: :development
 
 gem 'rack-mini-profiler'
 
+# to generate sha
+gem "bcrypt-ruby", :require => "bcrypt"
